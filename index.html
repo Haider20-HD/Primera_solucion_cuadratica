@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solución de Ecuaciones Cuadráticas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        /* Menú lateral */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #2c3e50, #1a2530);
+            color: white;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 3px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .logo {
+            text-align: center;
+            padding: 20px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: #4CAF50;
+        }
+
+        .nav-links {
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        .nav-links li {
+            padding: 15px 25px;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links li:hover, .nav-links li.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #4CAF50;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+        }
+
+        .nav-links li i {
+            margin-right: 15px;
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Contenido principal */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .header h2 {
+            font-size: 1.8rem;
+            color: #2c3e50;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        /* Panel de entrada */
+        .input-panel {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .input-panel h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4CAF50;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calculate-btn {
+            background-color: #4CAF50;
+            color: white;
+            flex: 2;
+        }
+
+        .calculate-btn:hover {
+            background-color: #3d8b40;
+            transform: translateY(-2px);
+        }
+
+        .clear-btn {
+            background-color: #f5f5f5;
+            color: #555;
+            flex: 1;
+        }
+
+        .clear-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Panel de resultados */
+        .result-panel {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-panel h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2196F3;
+        }
+
+        .result-content {
+            padding: 10px 0;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .discriminant-info {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #2196F3;
+        }
+
+        .discriminant-info h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .discriminant-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .solution-box {
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+
+        .real-solution {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .complex-solution {
+            background-color: #fff3e0;
+            border: 1px solid #ffcc80;
+            color: #ef6c00;
+        }
+
+        .single-solution {
+            background-color: #e3f2fd;
+            border: 1px solid #bbdefb;
+            color: #1565c0;
+        }
+
+        .solution-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .solution-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .solution-details {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .equation-display {
+            font-size: 1.3rem;
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 10px 0;
+            }
+            
+            .nav-links {
+                display: flex;
+                overflow-x: auto;
+            }
+            
+            .nav-links li {
+                padding: 10px 15px;
+                border-left: none;
+                border-bottom: 4px solid transparent;
+                white-space: nowrap;
+            }
+            
+            .nav-links li:hover, .nav-links li.active {
+                border-left: none;
+                border-bottom: 4px solid #4CAF50;
+            }
+            
+            .content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Menú lateral -->
+    <nav class="sidebar">
+        <div class="logo">
+            <h1>Ecuaciones <span>Cuadráticas</span></h1>
+        </div>
+        <ul class="nav-links">
+            <li class="active">
+                <a href="#">
+                    <i class="fas fa-calculator"></i>
+                    Calculadora
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-book"></i>
+                    Teoría
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-chart-bar"></i>
+                    Gráficos
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-history"></i>
+                    Historial
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-question-circle"></i>
+                    Ayuda
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-cog"></i>
+                    Configuración
+                </a>
+            </li>
+        </ul>
+        <div class="footer">
+            <p>© 2023 Solución de Ecuaciones Cuadráticas</p>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="header">
+            <h2>Solución de Ecuaciones Cuadráticas</h2>
+            <p>Ingresa los coeficientes a, b y c para resolver la ecuación cuadrática de la forma: ax² + bx + c = 0</p>
+        </div>
+
+        <div class="content">
+            <!-- Panel de entrada -->
+            <div class="input-panel">
+                <h3><i class="fas fa-edit"></i> Ingresar Coeficientes</h3>
+                <div class="input-group">
+                    <label for="coef-a">Coeficiente a:</label>
+                    <input type="number" id="coef-a" placeholder="Ejemplo: 1" step="any" value="1">
+                </div>
+                <div class="input-group">
+                    <label for="coef-b">Coeficiente b:</label>
+                    <input type="number" id="coef-b" placeholder="Ejemplo: -3" step="any" value="-3">
+                </div>
+                <div class="input-group">
+                    <label for="coef-c">Coeficiente c:</label>
+                    <input type="number" id="coef-c" placeholder="Ejemplo: 2" step="any" value="2">
+                </div>
+                
+                <div class="button-group">
+                    <button class="calculate-btn" id="calculate">
+                        <i class="fas fa-calculator"></i> Calcular Soluciones
+                    </button>
+                    <button class="clear-btn" id="clear">
+                        <i class="fas fa-broom"></i> Limpiar
+                    </button>
+                </div>
+                
+                <div class="discriminant-info">
+                    <h4>¿Qué es el discriminante?</h4>
+                    <p>El discriminante (D) se calcula como: <strong>D = b² - 4ac</strong></p>
+                    <p>• Si D > 0: Dos soluciones reales diferentes</p>
+                    <p>• Si D = 0: Una solución real única</p>
+                    <p>• Si D < 0: Soluciones complejas (no reales)</p>
+                </div>
+            </div>
+
+            <!-- Panel de resultados -->
+            <div class="result-panel">
+                <h3><i class="fas fa-chart-line"></i> Resultados</h3>
+                <div class="equation-display" id="equation-display">
+                    x² - 3x + 2 = 0
+                </div>
+                
+                <div class="result-content">
+                    <div class="discriminant-info">
+                        <h4>Valor del Discriminante (D)</h4>
+                        <div class="discriminant-value" id="discriminant-value">D = 1</div>
+                        <p id="discriminant-message">D > 0: La ecuación tiene dos soluciones reales diferentes</p>
+                    </div>
+                    
+                    <div class="solution-box real-solution" id="solution-box">
+                        <div class="solution-title">Soluciones de la ecuación:</div>
+                        <div class="solution-value" id="solution-value">x₁ = 2.000, x₂ = 1.000</div>
+                        <div class="solution-details" id="solution-details">Soluciones reales diferentes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Referencias a los elementos del DOM
+            const coefA = document.getElementById('coef-a');
+            const coefB = document.getElementById('coef-b');
+            const coefC = document.getElementById('coef-c');
+            const calculateBtn = document.getElementById('calculate');
+            const clearBtn = document.getElementById('clear');
+            const equationDisplay = document.getElementById('equation-display');
+            const discriminantValue = document.getElementById('discriminant-value');
+            const discriminantMessage = document.getElementById('discriminant-message');
+            const solutionBox = document.getElementById('solution-box');
+            const solutionValue = document.getElementById('solution-value');
+            const solutionDetails = document.getElementById('solution-details');
+            
+            // Función para actualizar la visualización de la ecuación
+            function updateEquationDisplay() {
+                const a = parseFloat(coefA.value) || 0;
+                const b = parseFloat(coefB.value) || 0;
+                const c = parseFloat(coefC.value) || 0;
+                
+                // Formatear la ecuación
+                let equation = '';
+                
+                if (a !== 0) {
+                    if (a === 1) equation += 'x²';
+                    else if (a === -1) equation += '-x²';
+                    else equation += `${a}x²`;
+                }
+                
+                if (b !== 0) {
+                    if (b > 0 && a !== 0) equation += ' + ';
+                    else if (b < 0) equation += ' - ';
+                    
+                    if (Math.abs(b) !== 1) equation += `${Math.abs(b)}`;
+                    equation += 'x';
+                }
+                
+                if (c !== 0) {
+                    if (c > 0 && (a !== 0 || b !== 0)) equation += ' + ';
+                    else if (c < 0) equation += ' - ';
+                    equation += `${Math.abs(c)}`;
+                }
+                
+                // Si todos los coeficientes son 0
+                if (equation === '') equation = '0';
+                
+                equation += ' = 0';
+                equationDisplay.textContent = equation;
+            }
+            
+            // Función para calcular las soluciones
+            function calculateSolutions() {
+                const a = parseFloat(coefA.value);
+                const b = parseFloat(coefB.value);
+                const c = parseFloat(coefC.value);
+                
+                // Validar entrada
+                if (isNaN(a) || isNaN(b) || isNaN(c)) {
+                    alert("Por favor, ingresa valores numéricos válidos para todos los coeficientes.");
+                    return;
+                }
+                
+                if (a === 0) {
+                    alert("El coeficiente 'a' no puede ser cero en una ecuación cuadrática.");
+                    return;
+                }
+                
+                // Calcular el discriminante
+                const D = b * b - 4 * a * c;
+                
+                // Actualizar el valor del discriminante
+                discriminantValue.textContent = `D = ${D.toFixed(3)}`;
+                
+                // Determinar el tipo de soluciones
+                if (D > 0) {
+                    // Dos soluciones reales
+                    const x1 = (-b + Math.sqrt(D)) / (2 * a);
+                    const x2 = (-b - Math.sqrt(D)) / (2 * a);
+                    
+                    // Actualizar mensaje
+                    discriminantMessage.textContent = `D > 0: La ecuación tiene dos soluciones reales diferentes`;
+                    
+                    // Actualizar solución
+                    solutionBox.className = "solution-box real-solution";
+                    solutionValue.textContent = `x₁ = ${x1.toFixed(3)}, x₂ = ${x2.toFixed(3)}`;
+                    solutionDetails.textContent = `Soluciones reales diferentes calculadas con la fórmula: x = (-b ± √D) / (2a)`;
+                } 
+                else if (D === 0) {
+                    // Una solución real
+                    const x = -b / (2 * a);
+                    
+                    // Actualizar mensaje
+                    discriminantMessage.textContent = `D = 0: La ecuación tiene una solución real única`;
+                    
+                    // Actualizar solución
+                    solutionBox.className = "solution-box single-solution";
+                    solutionValue.textContent = `x = ${x.toFixed(3)}`;
+                    solutionDetails.textContent = `Solución real única (raíz doble) calculada con la fórmula: x = -b / (2a)`;
+                } 
+                else {
+                    // Soluciones complejas
+                    const realPart = -b / (2 * a);
+                    const imaginaryPart = Math.sqrt(-D) / (2 * a);
+                    
+                    // Actualizar mensaje
+                    discriminantMessage.textContent = `D < 0: La ecuación tiene soluciones complejas (no reales)`;
+                    
+                    // Actualizar solución
+                    solutionBox.className = "solution-box complex-solution";
+                    solutionValue.textContent = `x₁ = ${realPart.toFixed(3)} + ${imaginaryPart.toFixed(3)}i, x₂ = ${realPart.toFixed(3)} - ${imaginaryPart.toFixed(3)}i`;
+                    solutionDetails.textContent = `Soluciones complejas conjugadas calculadas con la fórmula: x = (-b ± i√|D|) / (2a)`;
+                }
+            }
+            
+            // Función para limpiar los campos
+            function clearFields() {
+                coefA.value = '1';
+                coefB.value = '-3';
+                coefC.value = '2';
+                updateEquationDisplay();
+                calculateSolutions(); // Recalcular con valores por defecto
+            }
+            
+            // Event Listeners
+            calculateBtn.addEventListener('click', calculateSolutions);
+            clearBtn.addEventListener('click', clearFields);
+            
+            // Actualizar la ecuación cuando cambian los coeficientes
+            coefA.addEventListener('input', updateEquationDisplay);
+            coefB.addEventListener('input', updateEquationDisplay);
+            coefC.addEventListener('input', updateEquationDisplay);
+            
+            // Inicializar con valores por defecto
+            updateEquationDisplay();
+            calculateSolutions();
+            
+            // Agregar interacción al menú lateral
+            const navItems = document.querySelectorAll('.nav-links li');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Simular la funcionalidad de las otras secciones (en una app real esto cargaría contenido diferente)
+                    if(this.querySelector('a').textContent.includes('Teoría')) {
+                        alert("En una aplicación completa, aquí se mostraría información teórica sobre ecuaciones cuadráticas.");
+                    } else if(this.querySelector('a').textContent.includes('Gráficos')) {
+                        alert("En una aplicación completa, aquí se mostrarían gráficos de la función cuadrática.");
+                    } else if(this.querySelector('a').textContent.includes('Historial')) {
+                        alert("En una aplicación completa, aquí se mostraría el historial de cálculos.");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
