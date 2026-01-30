@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solución de Ecuaciones Cuadráticas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
             margin: 0;
@@ -212,6 +213,58 @@
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid #2196F3;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .decimal-control {
+            display: flex;
+            align-items: center;
+            background-color: #f0f7ff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .decimal-control span {
+            margin-right: 10px;
+            color: #555;
+        }
+
+        .decimal-control button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .decimal-control button:hover {
+            background-color: #0d8bf2;
+            transform: scale(1.1);
+        }
+
+        .decimal-control button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .decimal-value {
+            margin: 0 10px;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+            color: #2196F3;
         }
 
         .result-content {
@@ -277,6 +330,7 @@
             font-size: 1.5rem;
             font-weight: bold;
             margin: 10px 0;
+            font-family: 'Courier New', monospace;
         }
 
         .solution-details {
@@ -293,6 +347,130 @@
             background-color: #f8f9fa;
             border-radius: 8px;
             font-family: 'Courier New', monospace;
+        }
+
+        /* Panel de gráfica */
+        .graph-panel {
+            width: 100%;
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-top: 30px;
+        }
+
+        .graph-panel h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #FF9800;
+        }
+
+        .graph-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+
+        .graph-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .range-control {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .range-control label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .range-control .range-value {
+            font-weight: normal;
+            color: #2196F3;
+        }
+
+        .range-control input[type="range"] {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #ddd;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .range-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #2196F3;
+            cursor: pointer;
+        }
+
+        .range-control input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #2196F3;
+            cursor: pointer;
+            border: none;
+        }
+
+        .range-control-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .range-control-group .range-control {
+            flex: 1;
+        }
+
+        .reset-graph-btn {
+            background-color: #FF9800;
+            color: white;
+            padding: 10px 20px;
+            align-self: center;
+            margin-top: 10px;
+        }
+
+        .reset-graph-btn:hover {
+            background-color: #f57c00;
+        }
+
+        .graph-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .graph-info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .graph-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
         }
 
         /* Responsive */
@@ -325,6 +503,23 @@
             
             .content {
                 flex-direction: column;
+            }
+            
+            .result-panel h3 {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .decimal-control {
+                margin-top: 10px;
+            }
+            
+            .graph-container {
+                height: 300px;
+            }
+            
+            .graph-controls {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -422,7 +617,19 @@
 
             <!-- Panel de resultados -->
             <div class="result-panel">
-                <h3><i class="fas fa-chart-line"></i> Resultados</h3>
+                <h3>
+                    <i class="fas fa-chart-line"></i> Resultados
+                    <div class="decimal-control">
+                        <span>Decimales:</span>
+                        <button id="decrease-decimals" title="Reducir decimales">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <div class="decimal-value" id="decimal-value">3</div>
+                        <button id="increase-decimals" title="Aumentar decimales">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </h3>
                 <div class="equation-display" id="equation-display">
                     x² - 3x + 2 = 0
                 </div>
@@ -442,6 +649,51 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Panel de gráfica -->
+        <div class="graph-panel">
+            <h3><i class="fas fa-chart-line"></i> Gráfica de la Parábola</h3>
+            
+            <div class="graph-container">
+                <canvas id="parabolaChart"></canvas>
+            </div>
+            
+            <div class="graph-controls">
+                <div class="range-control-group">
+                    <div class="range-control">
+                        <label>Rango Eje X: <span class="range-value" id="x-range-value">-5 a 5</span></label>
+                        <input type="range" id="x-range" min="1" max="20" value="5" step="1">
+                    </div>
+                    <div class="range-control">
+                        <label>Rango Eje Y: <span class="range-value" id="y-range-value">-10 a 10</span></label>
+                        <input type="range" id="y-range" min="1" max="30" value="10" step="1">
+                    </div>
+                </div>
+                
+                <button class="reset-graph-btn" id="reset-graph">
+                    <i class="fas fa-sync-alt"></i> Restablecer Vista
+                </button>
+            </div>
+            
+            <div class="graph-info">
+                <div class="graph-info-item">
+                    <div class="graph-color" style="background-color: #2196F3;"></div>
+                    <span>Gráfica de la función: f(x) = ax² + bx + c</span>
+                </div>
+                <div class="graph-info-item">
+                    <div class="graph-color" style="background-color: #4CAF50;"></div>
+                    <span>Raíces de la ecuación (soluciones)</span>
+                </div>
+                <div class="graph-info-item">
+                    <div class="graph-color" style="background-color: #FF9800;"></div>
+                    <span>Vértice de la parábola</span>
+                </div>
+                <div class="graph-info-item">
+                    <div class="graph-color" style="background-color: #F44336;"></div>
+                    <span>Eje de simetría</span>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script>
@@ -458,6 +710,78 @@
             const solutionBox = document.getElementById('solution-box');
             const solutionValue = document.getElementById('solution-value');
             const solutionDetails = document.getElementById('solution-details');
+            const decimalValue = document.getElementById('decimal-value');
+            const increaseDecimalsBtn = document.getElementById('increase-decimals');
+            const decreaseDecimalsBtn = document.getElementById('decrease-decimals');
+            const xRangeSlider = document.getElementById('x-range');
+            const yRangeSlider = document.getElementById('y-range');
+            const xRangeValue = document.getElementById('x-range-value');
+            const yRangeValue = document.getElementById('y-range-value');
+            const resetGraphBtn = document.getElementById('reset-graph');
+            
+            // Variables para gráfica
+            let parabolaChart = null;
+            let xRange = 5; // Valor por defecto para el rango X
+            let yRange = 10; // Valor por defecto para el rango Y
+            
+            // Variable para almacenar el número de decimales
+            let decimalPlaces = 3;
+            
+            // Función para formatear números con el número de decimales actual
+            function formatNumber(num) {
+                // Si el número es muy pequeño, evitar notación científica
+                if (Math.abs(num) < 0.000001 && num !== 0) {
+                    return num.toExponential(decimalPlaces);
+                }
+                
+                // Si el número es entero, no mostrar decimales innecesarios
+                if (Number.isInteger(num)) {
+                    return num.toString();
+                }
+                
+                // Formatear con el número de decimales seleccionado
+                return num.toFixed(decimalPlaces);
+            }
+            
+            // Función para actualizar el control de decimales
+            function updateDecimalControls() {
+                decimalValue.textContent = decimalPlaces;
+                
+                // Deshabilitar botones si se alcanzan los límites
+                decreaseDecimalsBtn.disabled = decimalPlaces <= 0;
+                increaseDecimalsBtn.disabled = decimalPlaces >= 10;
+                
+                // Actualizar visual de botones deshabilitados
+                if (decimalPlaces <= 0) {
+                    decreaseDecimalsBtn.style.backgroundColor = '#ccc';
+                } else {
+                    decreaseDecimalsBtn.style.backgroundColor = '#2196F3';
+                }
+                
+                if (decimalPlaces >= 10) {
+                    increaseDecimalsBtn.style.backgroundColor = '#ccc';
+                } else {
+                    increaseDecimalsBtn.style.backgroundColor = '#2196F3';
+                }
+            }
+            
+            // Función para aumentar decimales
+            function increaseDecimalPlaces() {
+                if (decimalPlaces < 10) {
+                    decimalPlaces++;
+                    updateDecimalControls();
+                    calculateSolutions(); // Recalcular para actualizar la visualización
+                }
+            }
+            
+            // Función para disminuir decimales
+            function decreaseDecimalPlaces() {
+                if (decimalPlaces > 0) {
+                    decimalPlaces--;
+                    updateDecimalControls();
+                    calculateSolutions(); // Recalcular para actualizar la visualización
+                }
+            }
             
             // Función para actualizar la visualización de la ecuación
             function updateEquationDisplay() {
@@ -471,21 +795,21 @@
                 if (a !== 0) {
                     if (a === 1) equation += 'x²';
                     else if (a === -1) equation += '-x²';
-                    else equation += `${a}x²`;
+                    else equation += `${formatNumber(a)}x²`;
                 }
                 
                 if (b !== 0) {
                     if (b > 0 && a !== 0) equation += ' + ';
                     else if (b < 0) equation += ' - ';
                     
-                    if (Math.abs(b) !== 1) equation += `${Math.abs(b)}`;
+                    if (Math.abs(b) !== 1) equation += `${formatNumber(Math.abs(b))}`;
                     equation += 'x';
                 }
                 
                 if (c !== 0) {
                     if (c > 0 && (a !== 0 || b !== 0)) equation += ' + ';
                     else if (c < 0) equation += ' - ';
-                    equation += `${Math.abs(c)}`;
+                    equation += `${formatNumber(Math.abs(c))}`;
                 }
                 
                 // Si todos los coeficientes son 0
@@ -516,7 +840,7 @@
                 const D = b * b - 4 * a * c;
                 
                 // Actualizar el valor del discriminante
-                discriminantValue.textContent = `D = ${D.toFixed(3)}`;
+                discriminantValue.textContent = `D = ${formatNumber(D)}`;
                 
                 // Determinar el tipo de soluciones
                 if (D > 0) {
@@ -529,7 +853,7 @@
                     
                     // Actualizar solución
                     solutionBox.className = "solution-box real-solution";
-                    solutionValue.textContent = `x₁ = ${x1.toFixed(3)}, x₂ = ${x2.toFixed(3)}`;
+                    solutionValue.textContent = `x₁ = ${formatNumber(x1)}, x₂ = ${formatNumber(x2)}`;
                     solutionDetails.textContent = `Soluciones reales diferentes calculadas con la fórmula: x = (-b ± √D) / (2a)`;
                 } 
                 else if (D === 0) {
@@ -541,7 +865,7 @@
                     
                     // Actualizar solución
                     solutionBox.className = "solution-box single-solution";
-                    solutionValue.textContent = `x = ${x.toFixed(3)}`;
+                    solutionValue.textContent = `x = ${formatNumber(x)}`;
                     solutionDetails.textContent = `Solución real única (raíz doble) calculada con la fórmula: x = -b / (2a)`;
                 } 
                 else {
@@ -554,9 +878,212 @@
                     
                     // Actualizar solución
                     solutionBox.className = "solution-box complex-solution";
-                    solutionValue.textContent = `x₁ = ${realPart.toFixed(3)} + ${imaginaryPart.toFixed(3)}i, x₂ = ${realPart.toFixed(3)} - ${imaginaryPart.toFixed(3)}i`;
+                    solutionValue.textContent = `x₁ = ${formatNumber(realPart)} + ${formatNumber(imaginaryPart)}i, x₂ = ${formatNumber(realPart)} - ${formatNumber(imaginaryPart)}i`;
                     solutionDetails.textContent = `Soluciones complejas conjugadas calculadas con la fórmula: x = (-b ± i√|D|) / (2a)`;
                 }
+                
+                // Actualizar gráfica
+                updateGraph();
+            }
+            
+            // Función para actualizar los valores de rango
+            function updateRangeValues() {
+                xRangeValue.textContent = `-${xRange} a ${xRange}`;
+                yRangeValue.textContent = `-${yRange} a ${yRange}`;
+            }
+            
+            // Función para crear/actualizar la gráfica
+            function updateGraph() {
+                const a = parseFloat(coefA.value) || 0;
+                const b = parseFloat(coefB.value) || 0;
+                const c = parseFloat(coefC.value) || 0;
+                
+                // Calcular el discriminante para saber si hay raíces reales
+                const D = b * b - 4 * a * c;
+                
+                // Calcular el vértice de la parábola
+                const vertexX = -b / (2 * a);
+                const vertexY = a * vertexX * vertexX + b * vertexX + c;
+                
+                // Calcular las raíces si existen
+                let roots = [];
+                if (D >= 0 && a !== 0) {
+                    const sqrtD = Math.sqrt(D);
+                    roots.push((-b + sqrtD) / (2 * a));
+                    if (D > 0) {
+                        roots.push((-b - sqrtD) / (2 * a));
+                    }
+                }
+                
+                // Generar datos para la gráfica
+                const step = 0.1;
+                const labels = [];
+                const data = [];
+                
+                for (let x = -xRange; x <= xRange; x += step) {
+                    labels.push(formatNumber(x));
+                    const y = a * x * x + b * x + c;
+                    data.push(y);
+                }
+                
+                // Configurar el gráfico
+                const ctx = document.getElementById('parabolaChart').getContext('2d');
+                
+                // Destruir gráfico anterior si existe
+                if (parabolaChart) {
+                    parabolaChart.destroy();
+                }
+                
+                // Crear array de puntos para las raíces
+                const rootPoints = roots.map(root => ({
+                    x: root,
+                    y: 0
+                }));
+                
+                // Crear punto para el vértice
+                const vertexPoint = {
+                    x: vertexX,
+                    y: vertexY
+                };
+                
+                // Crear puntos para el eje de simetría
+                const symmetryLinePoints = [];
+                const symmetryYMin = -yRange;
+                const symmetryYMax = yRange;
+                if (a !== 0) {
+                    symmetryLinePoints.push(
+                        {x: vertexX, y: symmetryYMin},
+                        {x: vertexX, y: symmetryYMax}
+                    );
+                }
+                
+                parabolaChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: `f(x) = ${a !== 0 ? `${formatNumber(a)}x²` : ''}${b !== 0 ? (b > 0 ? ' + ' : ' - ') + formatNumber(Math.abs(b)) + 'x' : ''}${c !== 0 ? (c > 0 ? ' + ' : ' - ') + formatNumber(Math.abs(c)) : ''}`,
+                                data: data,
+                                borderColor: '#2196F3',
+                                backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 0
+                            },
+                            {
+                                label: 'Raíces',
+                                data: rootPoints,
+                                type: 'scatter',
+                                backgroundColor: '#4CAF50',
+                                borderColor: '#4CAF50',
+                                borderWidth: 3,
+                                pointRadius: 8,
+                                pointHoverRadius: 10
+                            },
+                            {
+                                label: 'Vértice',
+                                data: [vertexPoint],
+                                type: 'scatter',
+                                backgroundColor: '#FF9800',
+                                borderColor: '#FF9800',
+                                borderWidth: 3,
+                                pointRadius: 8,
+                                pointHoverRadius: 10
+                            },
+                            {
+                                label: 'Eje de simetría',
+                                data: symmetryLinePoints,
+                                type: 'line',
+                                borderColor: '#F44336',
+                                backgroundColor: 'transparent',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                pointRadius: 0,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Eje X',
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                },
+                                min: -xRange,
+                                max: xRange,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Eje Y',
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                },
+                                min: -yRange,
+                                max: yRange,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    font: {
+                                        size: 12
+                                    },
+                                    usePointStyle: true,
+                                    padding: 20
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += `(${formatNumber(context.parsed.x)}, ${formatNumber(context.parsed.y)})`;
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'nearest'
+                        }
+                    }
+                });
+            }
+            
+            // Función para restablecer la vista de la gráfica
+            function resetGraphView() {
+                xRange = 5;
+                yRange = 10;
+                xRangeSlider.value = xRange;
+                yRangeSlider.value = yRange;
+                updateRangeValues();
+                updateGraph();
             }
             
             // Función para limpiar los campos
@@ -564,21 +1091,54 @@
                 coefA.value = '1';
                 coefB.value = '-3';
                 coefC.value = '2';
+                decimalPlaces = 3;
+                updateDecimalControls();
                 updateEquationDisplay();
+                resetGraphView();
                 calculateSolutions(); // Recalcular con valores por defecto
             }
             
             // Event Listeners
             calculateBtn.addEventListener('click', calculateSolutions);
             clearBtn.addEventListener('click', clearFields);
+            increaseDecimalsBtn.addEventListener('click', increaseDecimalPlaces);
+            decreaseDecimalsBtn.addEventListener('click', decreaseDecimalPlaces);
+            resetGraphBtn.addEventListener('click', resetGraphView);
+            
+            // Controladores para los sliders de rango
+            xRangeSlider.addEventListener('input', function() {
+                xRange = parseInt(this.value);
+                updateRangeValues();
+                updateGraph();
+            });
+            
+            yRangeSlider.addEventListener('input', function() {
+                yRange = parseInt(this.value);
+                updateRangeValues();
+                updateGraph();
+            });
             
             // Actualizar la ecuación cuando cambian los coeficientes
-            coefA.addEventListener('input', updateEquationDisplay);
-            coefB.addEventListener('input', updateEquationDisplay);
-            coefC.addEventListener('input', updateEquationDisplay);
+            coefA.addEventListener('input', function() {
+                updateEquationDisplay();
+                updateGraph();
+            });
+            
+            coefB.addEventListener('input', function() {
+                updateEquationDisplay();
+                updateGraph();
+            });
+            
+            coefC.addEventListener('input', function() {
+                updateEquationDisplay();
+                updateGraph();
+            });
             
             // Inicializar con valores por defecto
+            updateDecimalControls();
+            updateRangeValues();
             updateEquationDisplay();
+            updateGraph();
             calculateSolutions();
             
             // Agregar interacción al menú lateral
@@ -588,15 +1148,51 @@
                     navItems.forEach(nav => nav.classList.remove('active'));
                     this.classList.add('active');
                     
-                    // Simular la funcionalidad de las otras secciones (en una app real esto cargaría contenido diferente)
+                    // Simular la funcionalidad de las otras secciones
                     if(this.querySelector('a').textContent.includes('Teoría')) {
                         alert("En una aplicación completa, aquí se mostraría información teórica sobre ecuaciones cuadráticas.");
                     } else if(this.querySelector('a').textContent.includes('Gráficos')) {
-                        alert("En una aplicación completa, aquí se mostrarían gráficos de la función cuadrática.");
+                        // Desplazar hacia la gráfica
+                        document.querySelector('.graph-panel').scrollIntoView({ behavior: 'smooth' });
                     } else if(this.querySelector('a').textContent.includes('Historial')) {
                         alert("En una aplicación completa, aquí se mostraría el historial de cálculos.");
                     }
                 });
+            });
+            
+            // Añadir atajos de teclado para ajustar decimales
+            document.addEventListener('keydown', function(event) {
+                // Ctrl + + para aumentar decimales
+                if ((event.ctrlKey || event.metaKey) && event.key === '+') {
+                    event.preventDefault();
+                    increaseDecimalPlaces();
+                }
+                
+                // Ctrl + - para disminuir decimales
+                if ((event.ctrlKey || event.metaKey) && event.key === '-') {
+                    event.preventDefault();
+                    decreaseDecimalPlaces();
+                }
+                
+                // Ctrl + 0 para resetear a 3 decimales
+                if ((event.ctrlKey || event.metaKey) && event.key === '0') {
+                    event.preventDefault();
+                    decimalPlaces = 3;
+                    updateDecimalControls();
+                    calculateSolutions();
+                }
+                
+                // Ctrl + G para centrar en la gráfica
+                if ((event.ctrlKey || event.metaKey) && event.key === 'g') {
+                    event.preventDefault();
+                    document.querySelector('.graph-panel').scrollIntoView({ behavior: 'smooth' });
+                }
+                
+                // Ctrl + R para restablecer vista de gráfica
+                if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
+                    event.preventDefault();
+                    resetGraphView();
+                }
             });
         });
     </script>
